@@ -1,7 +1,7 @@
 # xdelta_patcher_DWRD
-xdelta patcher Digimon Wolrd Re:Digitized
+xdelta patcher Digimon Wolrd Re:Digitize
 
-Easy bash script for patching Digimon World Re Digitized with English patch from OpDecode (https://digimonworldre.wordpress.com/)
+Easy bash script for patching Digimon World Re:Digitize with English patch from OpDecode (https://digimonworldre.wordpress.com/)
 
 Usage: 
 1) Download patch archive from https://digimonworldre.wordpress.com/
