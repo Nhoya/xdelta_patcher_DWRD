@@ -22,6 +22,8 @@ dep=(awk xdelta3)
 # For text color
 readonly RED="\033[01;31m"
 readonly GREEN="\033[01;32m"
+readonly YELLOW="\033[00;33m"
+readonly BLUE="\033[01;34m"
 readonly FINE="\033[0m"
 
 #checkdep
@@ -52,16 +54,23 @@ checkdep
 if [ "$missing" == "1" ]; then
         exit 0
 fi
-if   [ -z "$1" ]; then
-	echo -e $RED"ISO file missing, USATE: xdelta_pacher Digimonworld.iso"$FINE
+if [[ $(echo $1 |awk -F . '{print$NF}') != "iso" ]]; then
+	echo -e $RED"ISO file missing, USAGE:"$FINE
+	echo -e $RED"xdelta_patcher  path/to/digimon/iso.iso"$FINE
 	exit 0
 else
 hash=$(md5sum $1 |awk '{print$1}')
 
 	if [[ $hash == $hash1 ]] || [[ $hash == $hash2 ]]; then
 		ask_ver
-		xdelta3 -dfs $1 $DIR/"$(echo $hash |tr '[:lower:]' '[:upper:]')"_"$ver".xdelta  $DIR/"$(echo $1 |sed "s/.iso//""_patched.iso
-	else
+		echo -e $BLUE"Patching..."$FINE
+		xdelta3 -dfs $1 $DIR/"$(echo ${hash^^})"_"$ver".xdelta  $DIR/"$(echo $1 |sed "s/.iso//")"_"$ver"_patched.iso
+			if [ $? == 0 ]; then
+			echo -e $GREEN"Process Complete"$FINE
+			else
+			echo -e $RED"Operation Failed"$FINE
+			fi
+		else
 		echo -e $RED"This is not the correct ISO file"$FINE
 		echo -e $RED"your ISO file = $hash"$FINE
 		echo -e $RED"allowed ISOs = $hash1, $hash2"$FINE
