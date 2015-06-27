@@ -1,0 +1,69 @@
+#!/bin/bash
+
+#		Copyright (C) 2015  Nhoya.
+#
+#   xdelta_patcher_DWRD is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+hash1="031400b3febb5c3b7cc5c83776c119f7"
+hash2="512ba70738889081f262cbafe5e49143"
+DIR=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)
+dep=(awk xdelta3)
+# For text color
+readonly RED="\033[01;31m"
+readonly GREEN="\033[01;32m"
+readonly FINE="\033[0m"
+
+#checkdep
+checkdep(){
+	for i in "${dep[@]}"; do
+        if  ( ! which $i &>/dev/null ); then
+        	echo -e $RED"$i not found, solve the dipendencies before running the script"$FINE
+		missing="1"
+	fi
+	done
+}
+
+#ask which patch version (sub or dub)
+ask_ver(){
+echo -e $GREEN"Which patch version you want? (1=dub, 2=sub)"$FINE
+read input
+	case $input in
+		[1]) ver="dub"
+		;;
+		[2]) ver="sub"
+		;;
+		*) echo -e $RED"Enter valid parameter(1,2)"$FINE
+			exit 0
+        esac
+}
+
+checkdep
+if [ "$missing" == "1" ]; then
+        exit 0
+fi
+if   [ -z "$1" ]; then
+	echo -e $RED"ISO file missing, USATE: xdelta_pacher Digimonworld.iso"$FINE
+	exit 0
+else
+hash=$(md5sum $1 |awk '{print$1}')
+
+	if [[ $hash == $hash1 ]] || [[ $hash == $hash2 ]]; then
+		ask_ver
+		xdelta3 -dfs $1 $DIR/"$(echo $hash |tr '[:lower:]' '[:upper:]')"_"$ver".xdelta  $DIR/"$(echo $1 |sed "s/.iso//""_patched.iso
+	else
+		echo -e $RED"This is not the correct ISO file"$FINE
+		echo -e $RED"your ISO file = $hash"$FINE
+		echo -e $RED"allowed ISOs = $hash1, $hash2"$FINE
+	fi
+fi
