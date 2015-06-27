@@ -27,6 +27,16 @@ readonly BLUE="\033[01;34m"
 readonly FINE="\033[0m"
 
 #checkdep
+pb(){
+i=1
+sp="/-\|"
+	echo -n ' '
+	while true
+	do
+    		printf "\b${sp:i++%${#sp}:1}"
+		sleep 1
+	done
+}
 checkdep(){
 	for i in "${dep[@]}"; do
         if  ( ! which $i &>/dev/null ); then
@@ -59,15 +69,20 @@ if [[ $(echo $1 |awk -F . '{print$NF}') != "iso" ]]; then
 	echo -e $RED"xdelta_patcher  path/to/digimon/iso.iso"$FINE
 	exit 0
 else
-hash=$(md5sum $1 |awk '{print$1}')
+echo -e $GREEN"Calculating Hash..."$FINE
+pb & hash=$(md5sum $1 |awk '{print$1}')&& kill $!; trap 'kill $!' SIGTERM && echo ""
+
 
 	if [[ $hash == $hash1 ]] || [[ $hash == $hash2 ]]; then
 		ask_ver
 		echo -e $BLUE"Patching..."$FINE
-		xdelta3 -dfs $1 $DIR/"$(echo ${hash^^})"_"$ver".xdelta  $DIR/"$(echo $1 |sed "s/.iso//")"_"$ver"_patched.iso
+		pb & xdelta3 -dfs $1 $DIR/"$(echo ${hash^^})"_"$ver".xdelta  $DIR/"$(echo $1 |sed "s/.iso//")"_"$ver"_patched.iso
 			if [ $? == 0 ]; then
+			kill $!; trap 'kill $!' SIGTERM
+			echo ""
 			echo -e $GREEN"Process Complete"$FINE
 			else
+			kill $!; trap 'kill $!' SIGTERM
 			echo -e $RED"Operation Failed"$FINE
 			fi
 		else
