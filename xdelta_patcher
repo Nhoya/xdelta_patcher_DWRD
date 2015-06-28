@@ -34,7 +34,7 @@ sp="/-\|"
 	while true
 	do
     		printf "\b${sp:i++%${#sp}:1}"
-		sleep 1
+		sleep 0.3
 	done
 }
 checkdep(){
