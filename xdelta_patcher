@@ -28,14 +28,20 @@ readonly FINE="\033[0m"
 
 #checkdep
 pb(){
-i=1
-sp="/-\|"
-	echo -n ' '
-	while true
-	do
-    		printf "\b${sp:i++%${#sp}:1}"
-		sleep 0.3
-	done
+while true
+do
+	echo -ne $BLUE'[✵   ]\r'$FINE
+	sleep 0.2
+        echo -ne $BLUE'[✵✵  ]\r'$FINE
+	sleep 0.2
+        echo -ne $BLUE'[✵✵✵ ]\r'$FINE
+        sleep 0.2
+        echo -ne $BLUE'[ ✵✵✵]\r'$FINE
+	sleep 0.2
+        echo -ne $BLUE'[  ✵✵]\r'$FINE
+	sleep 0.2
+        echo -ne $BLUE'[   ✵]\r'$FINE
+done
 }
 checkdep(){
 	for i in "${dep[@]}"; do
@@ -48,7 +54,7 @@ checkdep(){
 
 #ask which patch version (sub or dub)
 ask_ver(){
-echo -e $GREEN"Which patch version you want? (1=dub, 2=sub)"$FINE
+echo -e $GREEN"Which patch version you want? (1=dub, 2=sub)\r"$FINE
 read input
 	case $input in
 		[1]) ver="dub"
@@ -65,12 +71,11 @@ if [ "$missing" == "1" ]; then
         exit 0
 fi
 if [[ $(echo $1 |awk -F . '{print$NF}') != "iso" ]]; then
-	echo -e $RED"ISO file missing, USAGE:"$FINE
-	echo -e $RED"xdelta_patcher  path/to/digimon/iso.iso"$FINE
+	echo -e $RED""$1" is not an ISO file"$FINE
 	exit 0
 else
 echo -e $GREEN"Calculating Hash..."$FINE
-pb & hash=$(md5sum $1 |awk '{print$1}')&& kill $!; trap 'kill $!' SIGTERM && echo ""
+pb & hash=$(md5sum $1 |awk '{print$1}')&& kill $!; trap 'kill $!' SIGTERM
 
 
 	if [[ $hash == $hash1 ]] || [[ $hash == $hash2 ]]; then
@@ -79,11 +84,10 @@ pb & hash=$(md5sum $1 |awk '{print$1}')&& kill $!; trap 'kill $!' SIGTERM && ech
 		pb & xdelta3 -dfs $1 $DIR/"$(echo ${hash^^})"_"$ver".xdelta  $DIR/"$(echo $1 |sed "s/.iso//")"_"$ver"_patched.iso
 			if [ $? == 0 ]; then
 			kill $!; trap 'kill $!' SIGTERM
-			echo ""
-			echo -e $GREEN"Process Complete"$FINE
+			echo -e $GREEN"Process Complete\r"$FINE
 			else
 			kill $!; trap 'kill $!' SIGTERM
-			echo -e $RED"Operation Failed"$FINE
+			echo -e $RED"Operation Failed\r"$FINE
 			fi
 		else
 		echo -e $RED"This is not the correct ISO file"$FINE
